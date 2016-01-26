@@ -9,10 +9,12 @@ class Mass(object): #Mass template object
         # SET MASS
         if (i==0):
             self.mass = 100#rand.uniform(100,1000) #generate mass; random number between 0,10
-        if (i==1):
+        elif (i==1):
             self.mass = 50
-        if (i==2):
+        elif (i==2):
             self.mass = 1
+        else:
+            self.mass = rand.uniform(100,1000)
 
         # SET POSITION
         posit = 400 #range of possible positions
@@ -51,10 +53,10 @@ class Mass(object): #Mass template object
         return KE
 
 #Constants
-masses = 3  #number of masses
+masses = 30  #number of masses
 rand.seed(86) #make results somewhat consistant
 dtime = .2 #resolution for time interval
-total_time = 100.0 # "length of time" simulaiton will run for
+total_time = 1000.0 # "length of time" simulaiton will run for
 iterations = int(total_time/dtime) #number of cycles checked
 size = 1000
 ## Generate objects
