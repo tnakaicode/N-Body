@@ -1,8 +1,6 @@
 print(' ')
 import random as rand
-import matplotlib.pyplot as plt
 import math
-from mpl_toolkits.mplot3d.axes3d import Axes3D
 import numpy as np
 
 ## Class MASS framework
@@ -61,13 +59,15 @@ iterations = int(total_time/dtime) #number of cycles checked
 size = 1000
 ## Generate objects
 objlist = [Mass(i) for i in range(masses)] # Create a list of point masses
-
+DATA = np.array(["masses", masses, "total_time", total_time,"dtime",dtime,"size",size])
+DATA_FILE = '../frames10/SIMULATION_SPEC.npy'
+np.save(DATA_FILE,DATA)
 ## Use objects
 for i in range(masses): #Give initial conditions
     objlist[i].CalcAccel() #Calculate initial Acceleration
     objlist[i].InitVelo() #Calculate initial Velocity
 
-fig = plt.figure(figsize=(12,6))
+#fig = plt.figure(figsize=(12,6))
 KE = []
 UE = []
 x = np.zeros(masses)
@@ -102,16 +102,16 @@ for t in range(iterations):
         #print(KE)
 
         #fig = plt.figure(figsize=(6,6))
-        ax=fig.add_subplot(1, 1, 1, projection='3d')
-        ax.scatter(x, y, z,'ro')
-        ax.view_init(elev = 45, azim = (t%2)*5+45)
-        ax.set_xlabel('X-Axis')
-        ax.set_ylabel('Y-Axis')
-        ax.set_zlabel('Z-Axis')
+        # ax=fig.add_subplot(1, 1, 1, projection='3d')
+        # ax.scatter(x, y, z,'ro')
+        # ax.view_init(elev = 45, azim = (t%2)*5+45)
+        # ax.set_xlabel('X-Axis')
+        # ax.set_ylabel('Y-Axis')
+        # ax.set_zlabel('Z-Axis')
 
-        ax.set_xlim3d(-size,size);
-        ax.set_ylim3d(-size,size);
-        ax.set_zlim3d(-size,size);
+        # ax.set_xlim3d(-size,size);
+        # ax.set_ylim3d(-size,size);
+        # ax.set_zlim3d(-size,size);
 
         # ax1=fig.add_subplot(1, 2, 2)
         # line = ax1.plot(times,KE,'r-',times,UE,'b-',times,[a+b for a,b in zip(KE,UE)],'g-')
