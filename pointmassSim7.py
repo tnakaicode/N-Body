@@ -33,7 +33,7 @@ class Mass(object): #Mass template object
                 diff = nam.position - self.position
                 radius = np.linalg.norm(diff) #find the difference in the X positions
                 preradius = radius**2
-                epsilon = .7 #softening factor
+                epsilon = 1.2 #softening factor
                 self.totalaccel = nam.mass/(preradius + epsilon) #find the total amount of acceleration
                 self.acceleration +=  self.totalaccel*diff/radius # Calculate acceleration in x-direction
                 self.UE = self.UE - self.totalaccel*radius*self.mass       
