@@ -4,16 +4,19 @@ import numpy as np
 
 ## Class MASS framework
 class Mass(object): #Mass template object
-    def __init__(self, i, masses):
+    def __init__(self, i, masses, set_masses = 0):
         self.numb_masses = masses
         self.id = i
         # SET MASS
-        if (i==0):
-            self.mass = 100#rand.uniform(100,1000) #generate mass; random number between 0,10
-        elif (i==1):
-            self.mass = 50
-        elif (i==2):
-            self.mass = 1
+        if set_masses == 1:
+            if (i==0):
+                self.mass = 100#rand.uniform(100,1000) #generate mass; random number between 0,10
+            elif (i==1):
+                self.mass = 50
+            elif (i==2):
+                self.mass = 1
+            else:
+                self.mass = rand.uniform(100,1000)
         else:
             self.mass = rand.uniform(100,1000)
 
@@ -52,8 +55,54 @@ class Mass(object): #Mass template object
         KE = .5*self.mass*v
         return KE
 
-def main():
-    pass
+def main(seed = 32):
+    #Constants
+    masses = 3  #number of masses
+    rand.seed(seed) #make results somewhat consistant
+    dtime = .2 #resolution for time interval
+    total_time = 100.0 # "length of time" simulaiton will run for
+    iterations = int(total_time/dtime) #number of cycles checked
+    size = 1000
+    ## Generate objects
+    objlist = [Mass(i, masses) for i in range(masses)] # Create a list of point masses
+
+    ## Use objects
+    for i in range(masses): #Give initial conditions
+        objlist[i].CalcAccel(objlist) #Calculate initial Acceleration
+        objlist[i].InitVelo() #Calculate initial Velocity
+
+    KE = []
+    UE = []
+    x = np.zeros(masses)
+    y = np.zeros(masses)
+    z = np.zeros(masses)
+    times = []
+    for t in range(iterations):
+
+        KEsum = 0
+        UEsum = 0
+
+        for i in range(masses):   #find Caracteristics for each particle
+            objlist[i].CalcPos(dtime)  #calculate position
+            objlist[i].CalcAccel(objlist)  #calculate acceleration
+            objlist[i].CalcVelo(dtime) #calculate velocity
+
+            # Add position values to array
+            x[i] = objlist[i].position[0] #update x position
+            y[i] = objlist[i].position[1] #update y position
+            z[i] = objlist[i].position[2] #update z position
+
+        #plotting each data point
+        if t%10 == 0:
+            namex = '../frames10/' + 'x' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
+            namey = '../frames10/' + 'y' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
+            namez = '../frames10/' + 'z' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
+            np.save(namex, x)
+            np.save(namey, y)
+            np.save(namez, z)
+            print namex
 
 if __name__ == "__main__":
-    main()
+    main(65)
+
+    
