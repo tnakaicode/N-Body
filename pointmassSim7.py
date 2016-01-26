@@ -70,8 +70,6 @@ for i in range(masses): #Give initial conditions
     objlist[i].InitVelo() #Calculate initial Velocity
 
 #fig = plt.figure(figsize=(12,6))
-KE = []
-UE = []
 x = np.zeros(masses)
 y = np.zeros(masses)
 z = np.zeros(masses)
@@ -85,41 +83,15 @@ for t in range(iterations):
         objlist[i].CalcPos()  #calculate position
         objlist[i].CalcAccel()  #calculate acceleration
         objlist[i].CalcVelo() #calculate velocity
-        #objlist[i].CheckBoundries(objlist[i].Xposition,objlist[i].Yposition,objlist[i].Zposition,size)
 
         # Add position values to array
-        x[i] = objlist[i].position[0] #update x position
-        y[i] = objlist[i].position[1] #update y position
-        z[i] = objlist[i].position[2] #update z position
-        #if t%10 == 0:
-        #    KEsum = KEsum + objlist[i].calcKE()
-        #    UEsum = UEsum + objlist[i].UE
+        if t%10 == 0:
+            x[i] = objlist[i].position[0] #update x position
+            y[i] = objlist[i].position[1] #update y position
+            z[i] = objlist[i].position[2] #update z position
 
-    #plotting each data point
+    #saving each data point
     if t%10 == 0:
-        #KE.append(KEsum)
-        # print "KE: ", KEsum, "UE: ",UEsum
-        # UE.append(UEsum/2)
-        times.append(t)
-        #print(KE)
-
-        #fig = plt.figure(figsize=(6,6))
-        # ax=fig.add_subplot(1, 1, 1, projection='3d')
-        # ax.scatter(x, y, z,'ro')
-        # ax.view_init(elev = 45, azim = (t%2)*5+45)
-        # ax.set_xlabel('X-Axis')
-        # ax.set_ylabel('Y-Axis')
-        # ax.set_zlabel('Z-Axis')
-
-        # ax.set_xlim3d(-size,size);
-        # ax.set_ylim3d(-size,size);
-        # ax.set_zlim3d(-size,size);
-
-        # ax1=fig.add_subplot(1, 2, 2)
-        # line = ax1.plot(times,KE,'r-',times,UE,'b-',times,[a+b for a,b in zip(KE,UE)],'g-')
-        # ax1.axis([0,iterations,0,1000])
-        # ax1.plot() 
-
         namex = '../frames10/' + 'x' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
         namey = '../frames10/' + 'y' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
         namez = '../frames10/' + 'z' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
