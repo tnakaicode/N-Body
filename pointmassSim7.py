@@ -17,13 +17,13 @@ class Mass(object): #Mass template object
             self.mass = 1
 
         # SET POSITION
-        posit = 400
+        posit = 400 #range of possible positions
         self.Xposition = rand.uniform(-posit,posit)  #generate X position; random number between 0,1
         self.Yposition = rand.uniform(-posit,posit)  #generate Y position; random number between 0,1
         self.Zposition = rand.uniform(-posit,posit)  #generate Z position; random number between 0,1
 
     def CalcAccel(self):   #CALCULATE ACCERATION DUE TO OTHER OBJECTS
-        self.Xacceleration = 0
+        self.Xacceleration = 0 #initialize to zero
         self.Yacceleration = 0
         self.Zacceleration = 0
         self.UE = 0
@@ -34,9 +34,10 @@ class Mass(object): #Mass template object
                 Xdiff = nam.Xposition - self.Xposition #find the difference in the X positions
                 Ydiff = nam.Yposition - self.Yposition #find the difference in the Y positions
                 Zdiff = nam.Zposition - self.Zposition
-                radius = math.sqrt((Xdiff)**2 + (Ydiff)**2 + (Zdiff)**2)  #find the radial distance to other particle
+                preradius = (Xdiff)**2 + (Ydiff)**2 + (Zdiff)**2
+                radius = math.sqrt(preradius)  #find the radial distance to other particle
                 if radius > .7:
-                    self.totalaccel = nam.mass/(radius**2) #find the total amount of acceleration
+                    self.totalaccel = nam.mass/preradius #find the total amount of acceleration
                 self.Xacceleration +=  self.totalaccel*Xdiff/(radius) # Calculate acceleration in x-direction
                 self.Yacceleration +=  self.totalaccel*Ydiff/(radius) # Calculate acceleration in y-direction
                 self.Zacceleration +=  self.totalaccel*Zdiff/(radius) # Calculate acceleration in z-direction
