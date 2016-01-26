@@ -3,7 +3,7 @@ import random as rand
 import matplotlib.pyplot as plt
 import math
 from mpl_toolkits.mplot3d.axes3d import Axes3D
-import numpy
+import numpy as np
 
 ## Class MASS framework
 class Mass(object): #Mass template object
@@ -18,72 +18,37 @@ class Mass(object): #Mass template object
 
         # SET POSITION
         posit = 400 #range of possible positions
-        self.Xposition = rand.uniform(-posit,posit)  #generate X position; random number between 0,1
-        self.Yposition = rand.uniform(-posit,posit)  #generate Y position; random number between 0,1
-        self.Zposition = rand.uniform(-posit,posit)  #generate Z position; random number between 0,1
+        self.position = np.random.uniform(-posit,posit,3)  #generate X position; random number between 0,1
+
 
     def CalcAccel(self):   #CALCULATE ACCERATION DUE TO OTHER OBJECTS
-        self.Xacceleration = 0 #initialize to zero
-        self.Yacceleration = 0
-        self.Zacceleration = 0
+        self.acceleration = np.array([0.,0.,0.])
         self.UE = 0
         for massindex in range(masses):  #go through each objec to find accel from that object
             self.totalaccel = 0
             nam = objlist[massindex]  #find object
             if nam.mass != self.mass:
-                Xdiff = nam.Xposition - self.Xposition #find the difference in the X positions
-                Ydiff = nam.Yposition - self.Yposition #find the difference in the Y positions
-                Zdiff = nam.Zposition - self.Zposition
-                preradius = (Xdiff)**2 + (Ydiff)**2 + (Zdiff)**2
-                radius = math.sqrt(preradius)  #find the radial distance to other particle
-                if radius > .7:
-                    self.totalaccel = nam.mass/preradius #find the total amount of acceleration
-                self.Xacceleration +=  self.totalaccel*Xdiff/(radius) # Calculate acceleration in x-direction
-                self.Yacceleration +=  self.totalaccel*Ydiff/(radius) # Calculate acceleration in y-direction
-                self.Zacceleration +=  self.totalaccel*Zdiff/(radius) # Calculate acceleration in z-direction
-
+                diff = nam.position - self.position
+                radius = np.linalg.norm(diff) #find the difference in the X positions
+                preradius = radius**2
+                epsilon = .7 #softening factor
+                self.totalaccel = nam.mass/(preradius + epsilon) #find the total amount of acceleration
+                self.acceleration +=  self.totalaccel*diff/radius # Calculate acceleration in x-direction
                 self.UE = self.UE - self.totalaccel*radius*self.mass       
 
     def InitVelo(self):
-        xyrad = math.sqrt(self.Xposition**2 + self.Yposition**2) #calculate the distance away from center if in xy plane
-
+        xyrad = math.sqrt(self.position[0]**2 + self.position[1]**2) #calculate the distance away from center if in xy plane
         totalvelocity = math.sqrt(xyrad*self.totalaccel) #calculate velocity needed given radius and acceleration (v**2/r = a)
+        self.velocity = np.array([rand.uniform(0,1),rand.uniform(0,1), rand.gauss(0,.05)])#totalvelocity*self.Yposition/(xyrad) #velo in x direction given by total velo/ (slope^2+1)
 
-        # SET VELOCITY
-        self.Xvelocity = rand.uniform(0,1)#totalvelocity*self.Yposition/(xyrad) #velo in x direction given by total velo/ (slope^2+1)
-        self.Yvelocity = rand.uniform(0,1)#-totalvelocity*self.Xposition/(xyrad) #use slope to calculate velo in y direction
-        self.Zvelocity = rand.gauss(0,.05) #give a random z componenet (gaussian distribution)
-        # SET ACCELERATION
+    def CalcVelo(self): #CALCULATE CHANGE IN VELOCITY
+        self.velocity = self.velocity + self.acceleration*dtime # vf = vi + At
 
-    def CalcVelo(self,Xaccel,Yaccel,Zaccel): #CALCULATE CHANGE IN VELOCITY
-        Xac = Xaccel
-        Yac = Yaccel
-        Zac = Zaccel
-        self.Xvelocity = self.Xvelocity + Xac*dtime # vf = vi + At
-        self.Yvelocity = self.Yvelocity + Yac*dtime
-        self.Zvelocity = self.Zvelocity + Zac*dtime
-
-    def CalcPos(self,Xvelocity,Yvelocity,Zvelocity,Xacceleration,Yacceleration,Zacceleration): #CALCULATE CHANGE IN POSITION
-        Xac = Xacceleration
-        Yac = Yacceleration
-        Zac = Zacceleration
-        Xvelo = Xvelocity
-        Yvelo = Yvelocity
-        Zvelo = Zvelocity
-        self.Xposition = self.Xposition + Xvelo*dtime + (dtime**2)*(Xac)/2 #Xf = Xi + Vt + .5at^2
-        self.Yposition = self.Yposition + Yvelo*dtime + (dtime**2)*(Yac)/2
-        self.Zposition = self.Zposition + Zvelo*dtime + (dtime**2)*(Zac)/2
-
-    def CheckBoundries(self, Xposition,Yposition,Zposition,size): #reverse velocity if position exceeds boundries
-        if Xposition > size or Xposition <-size:
-            self.Xposition = -self.Xposition
-        if Yposition > size or Yposition <-size:
-            self.Yposition = -self.Yposition            
-        if Zposition > size or Zposition <-size:
-            self.Zposition = -self.Zposition
+    def CalcPos(self): #CALCULATE CHANGE IN POSITION
+        self.position = self.position + self.velocity*dtime + (dtime**2)*(self.acceleration)/2 #Xf = Xi + Vt + .5at^2
 
     def calcKE(self):
-        v = (self.Xvelocity**2)+(self.Yvelocity**2)+(self.Zvelocity**2)
+        v = np.linalg.norm(self.velocity)
         KE = .5*self.mass*v
         return KE
 
@@ -91,7 +56,7 @@ class Mass(object): #Mass template object
 masses = 3  #number of masses
 rand.seed(86) #make results somewhat consistant
 dtime = .2 #resolution for time interval
-total_time = 1000.0 # "length of time" simulaiton will run for
+total_time = 100.0 # "length of time" simulaiton will run for
 iterations = int(total_time/dtime) #number of cycles checked
 size = 1000
 ## Generate objects
@@ -105,36 +70,35 @@ for i in range(masses): #Give initial conditions
 fig = plt.figure(figsize=(12,6))
 KE = []
 UE = []
+x = np.zeros(masses)
+y = np.zeros(masses)
+z = np.zeros(masses)
+times = []
 for t in range(iterations):
-    x = []
-    y = []
-    z = []
+
     KEsum = 0
     UEsum = 0
 
-
     for i in range(masses):   #find Caracteristics for each particle
-        objlist[i].CalcPos(objlist[i].Xvelocity,objlist[i].Yvelocity, objlist[i].Zvelocity, objlist[i].Xacceleration, objlist[i].Yacceleration, objlist[i].Zacceleration)  #calculate position
+        objlist[i].CalcPos()  #calculate position
         objlist[i].CalcAccel()  #calculate acceleration
-        
-        objlist[i].CalcVelo(objlist[i].Xacceleration,objlist[i].Yacceleration,objlist[i].Zacceleration) #calculate velocity
+        objlist[i].CalcVelo() #calculate velocity
         #objlist[i].CheckBoundries(objlist[i].Xposition,objlist[i].Yposition,objlist[i].Zposition,size)
 
         # Add position values to array
-        x.append(objlist[i].Xposition) #update x position
-        y.append(objlist[i].Yposition) #update y position
-        z.append(objlist[i].Zposition) #update z position
-        if t%10 ==0:
+        x[i] = objlist[i].position[0] #update x position
+        y[i] = objlist[i].position[1] #update y position
+        z[i] = objlist[i].position[2] #update z position
+        if t%10 == 0:
             KEsum = KEsum + objlist[i].calcKE()
             UEsum = UEsum + objlist[i].UE
 
     #plotting each data point
     if t%10 == 0:
         KE.append(KEsum)
-        print(KEsum)
+        print "KE: ", KEsum, "UE: ",UEsum
         UE.append(UEsum/2)
-        times = range(0,t+1,10)
-        #print(len(times))
+        times.append(t)
         #print(KE)
 
         #fig = plt.figure(figsize=(6,6))
@@ -150,10 +114,10 @@ for t in range(iterations):
         ax.set_zlim3d(-size,size);
 
         ax1=fig.add_subplot(1, 2, 2)
-        line = ax1.plot(times,KE,'r-',times,UE,'b-',times,[x+y for x,y in zip(KE,UE)],'g-')
-        #ax1.axis([0,iterations,0,1000])
-        #ax1.plot() 
+        line = ax1.plot(times,KE,'r-',times,UE,'b-',times,[a+b for a,b in zip(KE,UE)],'g-')
+        ax1.axis([0,iterations,0,1000])
+        ax1.plot() 
 
-        name = 'frames10/' + '0'*(4-len(str(t/10))) + str(t/10) + '.png'
+        name = '../frames10/' + '0'*(4-len(str(t/10))) + str(t/10) + '.png'
         plt.savefig(name)
         #plt.show()
