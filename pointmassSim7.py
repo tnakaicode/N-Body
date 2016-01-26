@@ -89,20 +89,20 @@ for t in range(iterations):
         x[i] = objlist[i].position[0] #update x position
         y[i] = objlist[i].position[1] #update y position
         z[i] = objlist[i].position[2] #update z position
-        if t%10 == 0:
-            KEsum = KEsum + objlist[i].calcKE()
-            UEsum = UEsum + objlist[i].UE
+        #if t%10 == 0:
+        #    KEsum = KEsum + objlist[i].calcKE()
+        #    UEsum = UEsum + objlist[i].UE
 
     #plotting each data point
     if t%10 == 0:
-        KE.append(KEsum)
-        print "KE: ", KEsum, "UE: ",UEsum
-        UE.append(UEsum/2)
+        #KE.append(KEsum)
+        # print "KE: ", KEsum, "UE: ",UEsum
+        # UE.append(UEsum/2)
         times.append(t)
         #print(KE)
 
         #fig = plt.figure(figsize=(6,6))
-        ax=fig.add_subplot(1, 2, 1, projection='3d')
+        ax=fig.add_subplot(1, 1, 1, projection='3d')
         ax.scatter(x, y, z,'ro')
         ax.view_init(elev = 45, azim = (t%2)*5+45)
         ax.set_xlabel('X-Axis')
@@ -113,11 +113,17 @@ for t in range(iterations):
         ax.set_ylim3d(-size,size);
         ax.set_zlim3d(-size,size);
 
-        ax1=fig.add_subplot(1, 2, 2)
-        line = ax1.plot(times,KE,'r-',times,UE,'b-',times,[a+b for a,b in zip(KE,UE)],'g-')
-        ax1.axis([0,iterations,0,1000])
-        ax1.plot() 
+        # ax1=fig.add_subplot(1, 2, 2)
+        # line = ax1.plot(times,KE,'r-',times,UE,'b-',times,[a+b for a,b in zip(KE,UE)],'g-')
+        # ax1.axis([0,iterations,0,1000])
+        # ax1.plot() 
 
-        name = '../frames10/' + '0'*(4-len(str(t/10))) + str(t/10) + '.png'
-        plt.savefig(name)
+        namex = '../frames10/' + 'x' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
+        namey = '../frames10/' + 'y' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
+        namez = '../frames10/' + 'z' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
+        np.save(namex, x)
+        np.save(namey, y)
+        np.save(namez, z)
+
+        #plt.savefig(name)
         #plt.show()
