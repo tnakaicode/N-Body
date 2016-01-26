@@ -4,8 +4,14 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 class plotter(object):
     def __init__(self):
-        self.loaddata()
-        self.initplot()
+        self.data_loaded_flag = 0
+
+    def setdata(self,masses, total_time,dtime,size):
+        self.masses = masses
+        self.total_time = total_time
+        self.dtime = dtime
+        self.size = size
+        self.data_loaded_flag = 1
 
     def loaddata(self):
         DATA = np.load("../frames10/SIMULATION_SPEC.npy")
@@ -18,6 +24,7 @@ class plotter(object):
             self.dtime = float(DATA[np.where(DATA == "dtime")[0][0]+1])
         if "size" in DATA:
             self.size = float(DATA[np.where(DATA == "size")[0][0]+1])
+        self.data_loaded_flag = 1
     #times = []
     # fig = plt.figure(figsize=(6,6))
     # ax=fig.add_subplot(1, 1, 1, projection='3d')
@@ -61,6 +68,11 @@ class plotter(object):
         print name
 
     def loopplot(self):
+        if self.data_loaded_flag:
+            self.loaddata()
+
+        self.initplot()
+
         for t in range(int(self.total_time/self.dtime+1)/10):
             self.plotdata(t)
         plt.close()

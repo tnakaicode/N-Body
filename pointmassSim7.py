@@ -5,7 +5,10 @@ import numpy as np
 
 ## Class MASS framework
 class Mass(object): #Mass template object
-    def __init__(self, i):
+    def __init__(self, i, masses, dtime):
+        self.numb_masses = masses
+        self.id = i
+        self.dtime = dtime
         # SET MASS
         if (i==0):
             self.mass = 100#rand.uniform(100,1000) #generate mass; random number between 0,10
@@ -17,17 +20,16 @@ class Mass(object): #Mass template object
             self.mass = rand.uniform(100,1000)
 
         # SET POSITION
-        posit = 400 #range of possible positions
+        posit = 400 #range of possible r0
         self.position = np.random.uniform(-posit,posit,3)  #generate X position; random number between 0,1
 
-
-    def CalcAccel(self):   #CALCULATE ACCERATION DUE TO OTHER OBJECTS
+    def CalcAccel(self, objlist):   #CALCULATE ACCERATION DUE TO OTHER OBJECTS
         self.acceleration = np.array([0.,0.,0.])
         self.UE = 0
-        for massindex in range(masses):  #go through each objec to find accel from that object
+        for massindex in range(self.numb_masses):  #go through each objec to find accel from that object
             self.totalaccel = 0
             nam = objlist[massindex]  #find object
-            if nam.mass != self.mass:
+            if nam.id != self.id:
                 diff = nam.position - self.position
                 radius = np.linalg.norm(diff) #find the difference in the X positions
                 preradius = radius**2
@@ -42,62 +44,12 @@ class Mass(object): #Mass template object
         self.velocity = np.array([rand.uniform(0,1),rand.uniform(0,1), rand.gauss(0,.05)])#totalvelocity*self.Yposition/(xyrad) #velo in x direction given by total velo/ (slope^2+1)
 
     def CalcVelo(self): #CALCULATE CHANGE IN VELOCITY
-        self.velocity = self.velocity + self.acceleration*dtime # vf = vi + At
+        self.velocity = self.velocity + self.acceleration*self.dtime # vf = vi + At
 
     def CalcPos(self): #CALCULATE CHANGE IN POSITION
-        self.position = self.position + self.velocity*dtime + (dtime**2)*(self.acceleration)/2 #Xf = Xi + Vt + .5at^2
+        self.position = self.position + self.velocity*self.dtime + (self.dtime**2)*(self.acceleration)/2 #Xf = Xi + Vt + .5at^2
 
     def calcKE(self):
         v = np.linalg.norm(self.velocity)
         KE = .5*self.mass*v
         return KE
-
-#Constants
-masses = 30  #number of masses
-rand.seed(86) #make results somewhat consistant
-dtime = .2 #resolution for time interval
-total_time = 1000.0 # "length of time" simulaiton will run for
-iterations = int(total_time/dtime) #number of cycles checked
-size = 1000
-## Generate objects
-objlist = [Mass(i) for i in range(masses)] # Create a list of point masses
-DATA = np.array(["masses", masses, "total_time", total_time,"dtime",dtime,"size",size])
-DATA_FILE = '../frames10/SIMULATION_SPEC.npy'
-np.save(DATA_FILE,DATA)
-## Use objects
-for i in range(masses): #Give initial conditions
-    objlist[i].CalcAccel() #Calculate initial Acceleration
-    objlist[i].InitVelo() #Calculate initial Velocity
-
-#fig = plt.figure(figsize=(12,6))
-x = np.zeros(masses)
-y = np.zeros(masses)
-z = np.zeros(masses)
-times = []
-for t in range(iterations):
-
-    KEsum = 0
-    UEsum = 0
-
-    for i in range(masses):   #find Caracteristics for each particle
-        objlist[i].CalcPos()  #calculate position
-        objlist[i].CalcAccel()  #calculate acceleration
-        objlist[i].CalcVelo() #calculate velocity
-
-        # Add position values to array
-        if t%10 == 0:
-            x[i] = objlist[i].position[0] #update x position
-            y[i] = objlist[i].position[1] #update y position
-            z[i] = objlist[i].position[2] #update z position
-
-    #saving each data point
-    if t%10 == 0:
-        namex = '../frames10/' + 'x' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
-        namey = '../frames10/' + 'y' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
-        namez = '../frames10/' + 'z' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
-        np.save(namex, x)
-        np.save(namey, y)
-        np.save(namez, z)
-
-        #plt.savefig(name)
-        #plt.show()
