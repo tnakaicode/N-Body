@@ -68,7 +68,7 @@ class plotter(object):
         print name
 
     def loopplot(self):
-        if self.data_loaded_flag:
+        if not self.data_loaded_flag:
             self.loaddata()
 
         self.initplot()
@@ -80,7 +80,6 @@ class plotter(object):
 def main():
     plott = plotter()
     plott.loopplot()
-
 
 if __name__ == "__main__":
     main()
