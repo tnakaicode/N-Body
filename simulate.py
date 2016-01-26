@@ -3,55 +3,85 @@ from plotdata import plotter
 import random as rand
 import numpy as np
 
-#Constants
-masses = 30  #number of masses
-rand.seed(86) #make results somewhat consistant
-dtime = .2 #resolution for time interval
-total_time = 1000.0 # "length of time" simulaiton will run for
-iterations = int(total_time/dtime) #number of cycles checked
-size = 1000
-DATA = np.array(["masses", masses, "total_time", total_time,"dtime",dtime,"size",size])
-DATA_FILE = '../frames10/SIMULATION_SPEC.npy'
-np.save(DATA_FILE,DATA)
+class simulator(object):
+    def __init__(self):
+        #Constants
+        self.masses = 30  #number of masses
+        rand.seed(86) #make results somewhat consistant
+        self.dtime = .2 #resolution for time interval
+        self.total_time = 1000.0 # "length of time" simulaiton will run for
+        self.iterations = int(self.total_time/self.dtime) #number of cycles checked
+        self.size = 1000
+        ## Generate objects
+        self.objlist = [Mass(i,self.masses) for i in range(self.masses)] # Create a list of point masses
 
-## Generate objects
-objlist = [Mass(i,masses,dtime) for i in range(masses)] # Create a list of point masses
+    def set_masses(self,new_masses):
+        self.mass = new_masses
+        self.objlist = [Mass(i,self.masses) for i in range(self.masses)]
 
-## Use objects
-for i in range(masses): #Give initial conditions
-    objlist[i].CalcAccel(objlist) #Calculate initial Acceleration
-    objlist[i].InitVelo() #Calculate initial Velocity
+    def set_dtime(self,new_dtime):
+        self.dtime = new_dtime
+        self.iterations = int(self.total_time/self.dtime) #number of cycles checked
 
-#fig = plt.figure(figsize=(12,6))
-x = np.zeros(masses)
-y = np.zeros(masses)
-z = np.zeros(masses)
-times = []
-for t in range(iterations):
+    def set_total_time(self,new_total_time):
+        self.total_time = new_total_time
+        self.iterations = int(self.total_time/self.dtime) #number of cycles checked
 
-    KEsum = 0
-    UEsum = 0
+    def set_size(self,new_size):
+        self.size = new_size
 
-    for i in range(masses):   #find Caracteristics for each particle
-        objlist[i].CalcPos()  #calculate position
-        objlist[i].CalcAccel(objlist)  #calculate acceleration
-        objlist[i].CalcVelo() #calculate velocity
+    def gen_config_file(self):
+        DATA = np.array(["masses", self.masses, "total_time", self.total_time,"dtime",self.dtime,"size",self.size])
+        DATA_FILE = '../frames10/SIMULATION_SPEC.npy'
+        np.save(DATA_FILE,DATA)
 
-        # Add position values to array
-        if t%10 == 0:
-            x[i] = objlist[i].position[0] #update x position
-            y[i] = objlist[i].position[1] #update y position
-            z[i] = objlist[i].position[2] #update z position
+    def initalize_vectors(self):
+        ## Use objects
+        for i in range(self.masses): #Give initial conditions
+            self.objlist[i].CalcAccel(self.objlist) #Calculate initial Acceleration
+            self.objlist[i].InitVelo() #Calculate initial Velocity
 
-    #saving each data point
-    if t%10 == 0:
-        namex = '../frames10/' + 'x' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
-        namey = '../frames10/' + 'y' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
-        namez = '../frames10/' + 'z' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
-        np.save(namex, x)
-        np.save(namey, y)
-        np.save(namez, z)
+    def run_calcs(self):
+        #fig = plt.figure(figsize=(12,6))
+        x = np.zeros(self.masses)
+        y = np.zeros(self.masses)
+        z = np.zeros(self.masses)
+        times = []
+        for t in range(self.iterations):
+            KEsum = 0
+            UEsum = 0
 
-plott = plotter()
-plott.setdata(masses,total_time,dtime,size)
-plott.loopplot()
+            for i in range(self.masses):   #find Caracteristics for each particle
+                self.objlist[i].CalcPos(self.dtime)  #calculate position
+                self.objlist[i].CalcAccel(self.objlist)  #calculate acceleration
+                self.objlist[i].CalcVelo(self.dtime) #calculate velocity
+
+                # Add position values to array
+                if t%10 == 0:
+                    x[i] = self.objlist[i].position[0] #update x position
+                    y[i] = self.objlist[i].position[1] #update y position
+                    z[i] = self.objlist[i].position[2] #update z position
+
+            #saving each data point
+            if t%10 == 0:
+                namex = '../frames10/' + 'x' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
+                namey = '../frames10/' + 'y' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
+                namez = '../frames10/' + 'z' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
+                np.save(namex, x)
+                np.save(namey, y)
+                np.save(namez, z)
+
+    def plot(self):
+        plott = plotter()
+        plott.setdata(self.masses,self.total_time,self.dtime,self.size)
+        plott.loopplot()
+
+def main():
+    sim = simulator()
+    sim.gen_config_file()
+    sim.initalize_vectors()
+    sim.run_calcs()
+    sim.plot()
+
+if __name__ == "__main__":
+    main()

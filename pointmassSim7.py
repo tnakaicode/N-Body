@@ -4,10 +4,9 @@ import numpy as np
 
 ## Class MASS framework
 class Mass(object): #Mass template object
-    def __init__(self, i, masses, dtime):
+    def __init__(self, i, masses):
         self.numb_masses = masses
         self.id = i
-        self.dtime = dtime
         # SET MASS
         if (i==0):
             self.mass = 100#rand.uniform(100,1000) #generate mass; random number between 0,10
@@ -42,13 +41,19 @@ class Mass(object): #Mass template object
         totalvelocity = math.sqrt(xyrad*self.totalaccel) #calculate velocity needed given radius and acceleration (v**2/r = a)
         self.velocity = np.array([rand.uniform(0,1),rand.uniform(0,1), rand.gauss(0,.05)])#totalvelocity*self.Yposition/(xyrad) #velo in x direction given by total velo/ (slope^2+1)
 
-    def CalcVelo(self): #CALCULATE CHANGE IN VELOCITY
-        self.velocity = self.velocity + self.acceleration*self.dtime # vf = vi + At
+    def CalcVelo(self,dtime): #CALCULATE CHANGE IN VELOCITY
+        self.velocity = self.velocity + self.acceleration*dtime # vf = vi + At
 
-    def CalcPos(self): #CALCULATE CHANGE IN POSITION
-        self.position = self.position + self.velocity*self.dtime + (self.dtime**2)*(self.acceleration)/2 #Xf = Xi + Vt + .5at^2
+    def CalcPos(self,dtime): #CALCULATE CHANGE IN POSITION
+        self.position = self.position + self.velocity*dtime + (dtime**2)*(self.acceleration)/2 #Xf = Xi + Vt + .5at^2
 
     def calcKE(self):
         v = np.linalg.norm(self.velocity)
         KE = .5*self.mass*v
         return KE
+
+def main():
+    pass
+
+if __name__ == "__main__":
+    main()
