@@ -1,4 +1,3 @@
-print(' ')
 import random as rand
 import math
 import numpy as np
