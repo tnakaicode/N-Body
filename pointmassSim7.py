@@ -100,7 +100,7 @@ def main(seed = 32):
             np.save(namex, x)
             np.save(namey, y)
             np.save(namez, z)
-            print namex
+            print (namex)
 
 if __name__ == "__main__":
     main(65)
