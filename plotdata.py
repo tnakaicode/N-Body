@@ -15,7 +15,7 @@ class plotter(object):
         self.data_loaded_flag = 1
 
     def loaddata(self):
-        DATA = np.load("../frames10/SIMULATION_SPEC.npy")
+        DATA = np.load("./tmp/SIMULATION_SPEC.npy")
         if "masses" in DATA:
             # print DATA[np.where(DATA == "masses")[0][0]+1]
             self.masses = int(DATA[np.where(DATA == "masses")[0][0] + 1])
@@ -34,11 +34,11 @@ class plotter(object):
     # ax.set_xlabel('X-Axis')
 
     def initplot(self):
-        namex = '../frames10/' + 'x' + '0' * \
+        namex = './tmp/' + 'x' + '0' * \
             (4 - len(str(0))) + str(0) + '.npy'
-        namey = '../frames10/' + 'y' + '0' * \
+        namey = './tmp/' + 'y' + '0' * \
             (4 - len(str(0))) + str(0) + '.npy'
-        namez = '../frames10/' + 'z' + '0' * \
+        namez = './tmp/' + 'z' + '0' * \
             (4 - len(str(0))) + str(0) + '.npy'
 
         x = np.load(namex)
@@ -58,11 +58,11 @@ class plotter(object):
         fig.canvas.draw()
 
     def plotdata(self, t):
-        namex = '../frames10/' + 'x' + '0' * \
+        namex = './tmp/' + 'x' + '0' * \
             (4 - len(str(t))) + str(t) + '.npy'
-        namey = '../frames10/' + 'y' + '0' * \
+        namey = './tmp/' + 'y' + '0' * \
             (4 - len(str(t))) + str(t) + '.npy'
-        namez = '../frames10/' + 'z' + '0' * \
+        namez = './tmp/' + 'z' + '0' * \
             (4 - len(str(t))) + str(t) + '.npy'
 
         x = np.load(namex)
@@ -71,7 +71,7 @@ class plotter(object):
         self.sc.remove()
         self.sc = self.ax.scatter(x, y, z, 'ro')
 
-        name = '../frames11/' + '0' * (4 - len(str(t))) + str(t) + '.png'
+        name = './tmp/' + '0' * (4 - len(str(t))) + str(t) + '.png'
         plt.savefig(name)
         print(name)
 

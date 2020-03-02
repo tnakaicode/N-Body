@@ -9,7 +9,7 @@ class simulator(object):
         # Constants
         self.masses = 30  # number of masses
         rand.seed(86)  # make results somewhat consistant
-        self.dtime = .2  # resolution for time interval
+        self.dtime = 0.2  # resolution for time interval
         self.total_time = 1000.0  # "length of time" simulaiton will run for
         # number of cycles checked
         self.iterations = int(self.total_time / self.dtime)
@@ -38,7 +38,7 @@ class simulator(object):
     def gen_config_file(self):
         DATA = np.array(["masses", self.masses, "total_time",
                          self.total_time, "dtime", self.dtime, "size", self.size])
-        DATA_FILE = '../frames10/SIMULATION_SPEC.npy'
+        DATA_FILE = './tmp/SIMULATION_SPEC.npy'
         np.save(DATA_FILE, DATA)
 
     def initalize_vectors(self):
@@ -72,11 +72,11 @@ class simulator(object):
 
             # saving each data point
             if t % 10 == 0:
-                namex = '../frames10/' + 'x' + '0' * \
+                namex = './tmp/' + 'x' + '0' * \
                     (4 - len(str(t / 10))) + str(t / 10) + '.npy'
-                namey = '../frames10/' + 'y' + '0' * \
+                namey = './tmp/' + 'y' + '0' * \
                     (4 - len(str(t / 10))) + str(t / 10) + '.npy'
-                namez = '../frames10/' + 'z' + '0' * \
+                namez = './tmp/' + 'z' + '0' * \
                     (4 - len(str(t / 10))) + str(t / 10) + '.npy'
                 np.save(namex, x)
                 np.save(namey, y)

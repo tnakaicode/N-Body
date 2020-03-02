@@ -94,9 +94,9 @@ def main(seed = 32):
 
         #plotting each data point
         if t%10 == 0:
-            namex = '../frames10/' + 'x' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
-            namey = '../frames10/' + 'y' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
-            namez = '../frames10/' + 'z' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
+            namex = './tmp/' + 'x' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
+            namey = './tmp/' + 'y' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
+            namez = './tmp/' + 'z' + '0'*(4-len(str(t/10))) + str(t/10) + '.npy'
             np.save(namex, x)
             np.save(namey, y)
             np.save(namez, z)
